@@ -1,0 +1,12 @@
+{
+  "name": "pack",
+  "description": "Fabriquer de bout en bout un pack de tache d'evaluation financiere : concevoir, batir, noter, verifier.",
+  "version": "1.0.0",
+  "keywords": [
+    "excel",
+    "modelisation-financiere",
+    "evaluation",
+    "qa",
+    "rubric"
+  ]
+}

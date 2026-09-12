@@ -1,0 +1,11 @@
+{
+  "name": "atelier-pack",
+  "description": "L'atelier de fabrication de packs de taches d'evaluation.",
+  "plugins": [
+    {
+      "name": "pack",
+      "source": "./",
+      "description": "Fabriquer de bout en bout un pack de tache d'evaluation financiere : concevoir, batir, noter, verifier."
+    }
+  ]
+}

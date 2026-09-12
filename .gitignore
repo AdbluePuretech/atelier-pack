@@ -1,0 +1,5 @@
+# Les gabarits sont des documents du corpus client.
+skills/pack/gabarits/*.docx
+skills/pack/gabarits/*.xlsx
+__pycache__/
+*.pyc
