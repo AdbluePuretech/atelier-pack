@@ -1,6 +1,9 @@
 {
   "name": "atelier-pack",
   "description": "L'atelier de fabrication de packs de taches d'evaluation.",
+  "owner": {
+    "name": "Amir Bouzidi"
+  },
   "plugins": [
     {
       "name": "pack",
