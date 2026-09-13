@@ -99,7 +99,7 @@ def couverture_structurelle(C, sentinelles):
     return {C.rev_idx[i] for i in vus}
 
 
-_ADR = re.compile(r"^'?([^'!]+)'?!([A-Z]{1,3})([0-9]+)$")
+_ADR = re.compile(r"^'?([^'!]+)'?!\$?([A-Z]{1,3})\$?([0-9]+)$")   # dollars admis : l'autotest les exige
 
 
 def _adresse(C, s):

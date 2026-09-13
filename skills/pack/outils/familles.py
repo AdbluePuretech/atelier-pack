@@ -184,7 +184,7 @@ def main():
     if a.lister_a_revoir:
         for f in familles:
             if f["statut"] == "a_revoir":
-                print(f"\n=== {f['id']}   {f['cellules']:,} cellules   {f['feuilles']}")
+                print(f"\n=== {f['id']}   {f['cellules']:,} cellules   {f.get('feuille', f.get('feuilles', ''))}")
                 print(f"    {f['squelette'][:200]}")
                 for ex in f["exemples"]:
                     print(f"      {ex['cellule']:<34} {ex['formule'][:130]}")

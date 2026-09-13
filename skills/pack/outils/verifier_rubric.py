@@ -36,7 +36,7 @@ PENALITES_CIBLE = (5, 7)
 CRITERES_GUIDE = (75, 200)
 PLAFOND_PENALITE = 0.20
 
-CRITERE = re.compile(r"^\s*\[([+-])\s*(\d+)\]\s*(.*)$")
+CRITERE = re.compile(r"^\s*\[([+\-−])\s*(\d+)\]\s*(.*)$")   # le gabarit Ostrom ecrit le vrai signe moins U+2212
 POIGNEE_P = re.compile(r"\[P\d+\]")
 POIGNEE_ID = re.compile(r"\[(?!P\d+\]|[+-])[A-Za-z0-9_.\-]{1,12}\]")
 SECTION = re.compile(r"^\s*Section\s+([A-Z0-9]+)\s*[—–-]\s*(.+)$", re.I)
@@ -126,7 +126,7 @@ def lire(chemin):
             m = CRITERE.match(l)
             if m:
                 dans_config = False
-                items.append((section, m.group(1), int(m.group(2)), m.group(3)))
+                items.append((section, "-" if m.group(1) == "−" else m.group(1), int(m.group(2)), m.group(3)))
             elif dans_config and l.strip():
                 config.append(l.strip())
     pool = None

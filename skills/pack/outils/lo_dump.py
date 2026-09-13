@@ -47,6 +47,7 @@ etat["iteration_appliquee"] = bool(doc.IsIterationEnabled)
 
 doc.calculateAll()
 
+ERREUR = __import__("re").compile(r"^(#(DIV/0!|VALUE!|REF!|NAME\?|N/A|NUM!|NULL!)|Err:\d+)$")
 valeurs, erreurs = {}, 0
 for i in range(doc.Sheets.Count):
     ws = doc.Sheets.getByIndex(i)
@@ -62,7 +63,7 @@ for i in range(doc.Sheets.Count):
         for c, v in enumerate(ligne):
             if isinstance(v, float) and v != 0:
                 d[f"{r + 1}:{c + 1}"] = v
-            elif isinstance(v, str) and v.startswith(("#", "Err:")):
+            elif isinstance(v, str) and ERREUR.match(v):   # un libelle "#" n'est pas une erreur
                 d[f"{r + 1}:{c + 1}"] = v
                 erreurs += 1
     valeurs[ws.Name] = d
