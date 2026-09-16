@@ -1,0 +1,34 @@
+{
+  "nom": "Essai",
+  "niveau": "L1",
+  "graine": "graine.md",
+  "conception": "CONCEPTION.md",
+  "ancrages": "ancrages.json",
+  "lot": null,
+  "premier_du_lot": true,
+  "golden": "build/GoldenSolution - Essai.xlsx",
+  "input_sheet": "build/InputSheet - Essai.xlsx",
+  "certificat": "build/audit/certificat.json",
+  "prompt": "build/Prompt - Essai.docx",
+  "rubric": "build/Rubric - Essai.docx",
+  "rubric_source": "build/rubric.txt",
+  "ai_output": "build/AI Output - Essai.xlsx",
+  "score_ai_output": "build/score_ai_output.json",
+  "cible_score": [
+    0,
+    45
+  ],
+  "paquet": [
+    "build/GoldenSolution - Essai.xlsx",
+    "build/InputSheet - Essai.xlsx",
+    "build/Prompt - Essai.docx",
+    "build/Rubric - Essai.docx"
+  ],
+  "juicing": {
+    "rubric": "build/Rubric - Essai (juicee).docx",
+    "rubric_source": "build/rubric_juicee.txt",
+    "score_adverse": "build/score_adverse.json",
+    "note_equite": "build/note_equite.md"
+  },
+  "controles_du_pack": {}
+}

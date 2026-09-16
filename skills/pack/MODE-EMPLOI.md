@@ -120,6 +120,14 @@ ou, plus directement :
 La skill enchaine cinq phases. **Chacune s'arrete et vous demande de valider avant
 de continuer.** C'est voulu : les decisions qui comptent sont les votres.
 
+**Chaque phase se ferme par une porte.** Une commande lance tous ses controles et reste
+fermee tant qu'une ligne n'est pas verte avec son compte. Porte ouverte, la skill vous
+montre le tableau, vous **propose** ce qui vaut un coup d'oeil — sans rien ouvrir, sauf
+si vous le demandez — et attend votre decision : `valide`, `modifie` ou `refuse`. Sans
+votre `valide`, la phase suivante refuse de demarrer ; et si un fichier change apres coup,
+la porte devient perimee et se repasse. Le dossier du pack s'equipe au depart avec
+`porte.py init`. Voir [les portes](references/portes.md).
+
 ### Phase 1 — Concevoir
 
 On cherche le **noyau dur** : la mecanique precise qui separera un bon modele d'un
@@ -130,14 +138,27 @@ On pose aussi les **ancrages** : les valeurs que la golden devra atteindre, deci
 *avant* de construire. Sans eux, on finit toujours par se convaincre que les valeurs
 qui sortent sont les bonnes.
 
-On y decide aussi **le budget de discrimination** : quelle part du pool de points
-vit derriere de la simple transcription. Au-dela d'environ 37 %, la tache passera
-au-dessus du seuil quoi qu'on fasse ensuite — un modele frontiere rend la
-complexite mecanique a 95 %.
+**Avant d'ecrire, on en parle.** La skill ne vous rend pas une conception toute faite :
+elle developpe les pistes avec vous, une question a la fois, et n'ecrit que ce que vous
+retenez. Et **la description de tache qu'on lui donne est un contrat** : rien n'y est
+ajoute qui ne se rattache a une de ses lignes.
 
-**Le niveau se decide ici**, et il commande la taille : **15 a 20 onglets de calcul
-en L1, 25 a 30 en L2, 41 a 50 en L3**. La **circularite est exigee a tous les
-niveaux**, et les formules doivent etre sophistiquees quel que soit le sujet.
+On y decide aussi **le budget de discrimination** : quelle part du pool de points
+vit derriere de la simple transcription. Au-dela d'environ 20 %, la tache passera
+au-dessus du seuil quoi qu'on fasse ensuite — un modele frontiere rend la
+complexite mecanique a 95 %. Et les difficultes restent **independantes** : une seule
+erreur ne doit jamais faire tomber toute la rubric.
+
+**Le niveau se decide ici, et il ne se compte pas en onglets.** Un L3 peut tenir en
+dix onglets si chacun porte une difficulte et une granularite tres elevees. Il se lit
+sur cinq axes : les **decisions derivees** que le candidat doit resoudre (le seul axe
+qui a suivi le score), les **boucles reelles**, la **granularite** (des lignes
+atomiques qui portent chacune leurs propres termes), la **densite logique** par onglet
+et la **sophistication** des formules. Les trois derniers se mesurent sur le fichier
+avec `outils/niveau.py`. Les **boucles de circularite sont un prerequis a tous les
+niveaux** : sans boucle reelle, pas de construction, et aucune derogation, meme quand la
+graine exclut les effets d'ordre fabriques. La grille :
+[le niveau vise](references/01-concevoir.md).
 
 **On choisit trois ou quatre mecaniques, de familles differentes** — le
 [catalogue](references/mecaniques-discriminantes.md) en propose treize, chacune avec
@@ -158,6 +179,9 @@ QA et note **81 %** faute de l'avoir fait : tout etait a redurcir.
 > **Ce qu'on vous demandera** : le sujet, ce que la tache doit evaluer, le niveau
 > vise, et le score que devrait obtenir un candidat serieux.
 
+> **Fin de phase** : porte 1 ouverte — la conception au plan impose, les ancrages au
+> format commun — et votre relais `valide`.
+
 ### Phase 2 — Batir
 
 Trois scripts sont ecrits pour votre pack : les ancrages, un calibrateur qui resout
@@ -166,7 +190,16 @@ les parametres, et un generateur qui ecrit le classeur.
 **Le classeur n'est jamais ecrit a la main.** Il est genere, parce qu'un ancrage
 finit toujours par bouger et qu'il faut pouvoir tout refaire a l'identique.
 
-> **Fin de phase** : `0 erreur` au recalcul, et chaque ancrage atteint.
+**La golden se construit par iterations** : le squelette, puis une mecanique a la fois,
+chacune fermee par sa petite porte et votre relais. **Vous y mettez la main quand vous
+voulez.** A chaque iteration, la skill vous dit ce qui vaut un coup d'oeil et ce que la
+mecanique a ajoute, et vous propose deux ou trois essais — sans ouvrir Excel, sauf si vous
+le demandez. Modifiez ce que vous voulez, enregistrez, fermez, dites « fait » : chacune de
+vos modifications vous est relue, et vous decidez si elle entre dans le generateur ou si
+c'etait un essai. Voir [les ateliers](references/ateliers.md).
+
+> **Fin de phase** : porte 2 ouverte — chaque iteration validee, `0 erreur`, chaque
+> ancrage atteint, les boucles au plancher, le niveau tenu — et votre relais `valide`.
 
 ### Phase 3 — Certifier
 
@@ -180,7 +213,8 @@ Cette phase **s'utilise aussi seule**, sur n'importe quel classeur qu'on n'a pas
 fabrique.
 
 > **Fin de phase** : un taux de couverture, et un issues log ou chaque etape non
-> lancee est inscrite comme travail non fait — jamais comme resultat favorable.
+> lancee est inscrite comme travail non fait — jamais comme resultat favorable. Dans un
+> pack : porte 3 ouverte (couverture ≥ 95 %) et votre relais `valide`.
 
 ### Phase 4 — Enoncer et noter
 
@@ -202,9 +236,9 @@ Puis on retourne la rubric contre la golden elle-meme.
 > [le contrat du prompt](references/contrat-prompt.md) et
 > [le contrat de la rubric](references/contrat-rubric.md).
 
-> **Fin de phase** : `verifier_prompt.py` et `verifier_rubric.py` sans echec, et la
-> golden marque **100 %** de sa propre rubric. En dessous, ce n'est pas le classeur
-> qui est faux, c'est la rubric.
+> **Fin de phase** : porte 4 ouverte — `verifier_prompt.py` et `verifier_rubric.py` sans
+> echec, la golden a **100 %** de sa propre rubric, chaque boucle notee — et votre relais
+> `valide`. En dessous de 100 %, ce n'est pas le classeur qui est faux, c'est la rubric.
 
 ### Phase 5 — Verifier
 
@@ -212,8 +246,9 @@ Cinq controles automatiques, quatre questions a se poser, et le **rollout** : on
 fabrique un candidat credible et on mesure ce qu'il obtient. C'est le seul moyen de
 savoir si la tache est reellement difficile, ou seulement mal ecrite.
 
-> **Fin de phase** : les controles au vert **avec leurs comptes**, et un score de
-> rollout dans la cible.
+> **Fin de phase** : porte 5 ouverte — les controles au vert **avec leurs comptes**, et la
+> feuille de score de l'AI Output, rendue sur claude.ai, dans la cible — et votre relais
+> `valide`.
 
 ---
 

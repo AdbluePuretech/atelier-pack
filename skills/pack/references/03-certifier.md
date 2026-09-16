@@ -174,6 +174,12 @@ Module a **jugement**, pas a verdict : imposer des verites generales produit des
 exceptions legitimes. Il a trouve un masque oublie sur une ligne de covenant que
 ni les vingt controles ni les circuits ni la convergence n'avaient vu.
 
+> **Sortie** : le nombre d'identites **testees**, avant le nombre d'ecarts. Jusqu'au
+> 16/09/2026, le module ne reconnaissait qu'un en-tete `FY-2A` : sur une grille datee
+> (jours, semaines, mois) il testait zero identite et imprimait « les identites
+> tiennent » — Sarrasin, Cobalt et Etain ont ete certifies avec ce faux vert. Il lit
+> maintenant une ligne de dates croissantes, et zero teste sort en « etape non faite ».
+
 ### 7. Revue des familles
 
 La seule etape qui demande un jugement metier.

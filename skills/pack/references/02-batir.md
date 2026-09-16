@@ -219,6 +219,23 @@ sert.
 > Apres correction : fuite residuelle **49 -> 0**, verdict **0 -> 1**. Le compteur
 > gouverne la gate de niveau : tant qu'il rendait zero, tout pack etait « non
 > conforme, ne depasse pas L1 ».
+>
+> **Deux corrections de plus le 14/09/2026, sur Cobalt**, qui rendait « 0 » sur quatre
+> boucles reelles :
+>
+> - **l'interrupteur general** cite dans chaque formule de boucle
+>   (`IF(Brk_All*Brk_X=1,...)`) etait coupe avec « tous les autres » pendant l'isolement,
+>   donc toutes les boucles tombaient. Il se reconnait desormais a ce qu'il coupe tous
+>   les cycles a lui seul quand les autres n'en coupent qu'une partie, et il n'est plus
+>   coupe pendant l'isolement ;
+> - **la citation se cherchait sans borne** : `Input_Sheet!$E$10` reconnaissait
+>   `$E$100` a `$E$109`, si bien que couper un interrupteur tranchait des formules
+>   etrangeres a sa boucle.
+>
+> Cote generateur, une regle en sort : **isoler le terme de boucle dans sa propre
+> cellule**. L'outil retire tous les arcs d'une formule qui cite l'interrupteur ; si cette
+> formule porte aussi le chemin commun des autres boucles, couper la sienne les coupe
+> toutes.
 
 ### Toute reponse dans un circuit est continue
 
@@ -312,10 +329,40 @@ et une formule ne se presentent pas pareil, et c'est la premiere chose qu'un
 relecteur financier regarde. Il s'applique tout seul quand le generateur importe le
 module de format plutot que d'ecrire ses couleurs a la main.
 
+**La mise en page n'est pas celle du pack precedent.** Le generateur lit la fiche de
+mise en page decidee en phase 1 — colonne des libelles, debut des valeurs, unites,
+page de garde, intercalaires, police, bandeaux, forme des blocs — **en un seul
+endroit**, et ne pose aucun style ailleurs. Recopier le `gen_base.py` d'un voisin
+recopie sa grille : c'est ainsi que quatre packs du lot RX se sont retrouves
+identiques sur les huit axes de structure. Voir **[la mise en page](mise-en-page.md)**.
+
+## La golden par iterations, et les ateliers avec l'auteur
+
+Un generateur eloigne l'auteur du modele : il ne le voit qu'une fois fini. **La golden se
+construit donc par iterations courtes**, chacune fermee par une mini-porte et un relais :
+
+| Iteration | Ce qu'elle batit | Sa porte |
+|-----------|------------------|----------|
+| 0, le squelette | input sheet, carte des onglets, mise en page de la fiche | `porte.py 2 --iteration 0` : cache, iteration armee |
+| 1 a n | une mecanique, `M1` puis `M2`... dans l'ordre de la conception | ancrages et boucles des mecaniques batties |
+| finale | la golden complete | `porte.py 2` : la sortie de phase ci-dessous |
+
+A chaque iteration ouverte, Claude **propose** au owner ce qui vaut un coup d'oeil — la
+copie `build/iterations/GS itNN` comparee a la precedente montre exactement ce que la
+mecanique a ajoute — **sans ouvrir la golden**, sauf s'il le demande. S'il la retouche,
+`outils/atelier.py relire` liste ses modifications cellule par cellule, et **chacune est
+reportee dans le generateur ou abandonnee, sur sa decision** (`atelier.py decider`). **Pas
+d'iteration suivante sans relais `valide`.** Le protocole : [les portes](portes.md).
+
+Deux regles ne se negocient pas : **le generateur reste la source de verite** (une
+modification non reportee disparait au build suivant, et on le dit), et **on n'ecrit jamais
+dans un classeur ouvert**. Le protocole complet : **[les ateliers](ateliers.md)**.
+
 ## Sortie de phase
 
 ```
-circularite         presente, quel que soit le sujet ; boucles nommees
+circularite         prerequis bloquant : au moins le plancher du niveau, quels que
+                    soient le sujet et la graine ; boucles nommees
 recalcul            0 erreur
 ancrages            chacun atteint, dans sa tolerance, sur les valeurs CALCULEES
 graine              fixe, le build est reproductible a l'identique
@@ -327,6 +374,12 @@ valeurs en dur      0 hors input sheet, ventilees par valeur distincte
 hypotheses mortes   0
 input sheet         extraite, 0 formule vers le modele, 0 groupement
 calcPr              iteration armee, relue APRES enregistrement
+niveau              outils/niveau.py : NIVEAU TENU SUR LE FICHIER = niveau vise,
+                    quel que soit le nombre d'onglets
+ateliers            un par mecanique, chaque modification de l'auteur reportee
+                    (0 ecart apres regeneration) ou abandonnee, sur sa decision
+iterations          0 a n, chacune ouverte et relayee valide
+porte               porte.py 2 pack.json : OUVERTE, puis relais 2 valide
 ```
 
 Tant qu'une de ces lignes n'est pas verte **avec son compte**, la phase 3 est

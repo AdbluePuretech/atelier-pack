@@ -32,6 +32,9 @@ def identifiant(*morceaux):
 
 
 EN_TETE = ("A.", "B.", "C.", "D.", "E.", "F.", "G.", "H.")
+# Un classeur dense porte plus de huit blocs par feuille (jusqu'a W. ou AB. sur Douro) : au-dela de H., la ligne
+# retombait sur un en-tete lointain ou « hors bloc », et des usages de sens different fusionnaient.
+EN_TETE_RE = __import__("re").compile(r"^[A-Z]{1,2}\.\s")
 
 
 def bloc_de(C, feuille, ligne, _cache={}):
@@ -40,11 +43,15 @@ def bloc_de(C, feuille, ligne, _cache={}):
     cle = (feuille, ligne)
     if cle in _cache:
         return _cache[cle]
+    # La colonne des en-tetes suit la mise en page : B, C ou D selon le pack. La
+    # chercher en C seulement rendait « (hors bloc) » partout sur une grille en D,
+    # et fusionnait des usages de sens different (Douro, 16/09/2026).
     for ll in range(ligne, max(ligne - 400, 0), -1):
-        v = C.textes.get((feuille, ll, 3))
-        if isinstance(v, str) and v.strip()[:2] in EN_TETE and len(v.strip()) > 4:
-            _cache[cle] = v.strip()
-            return _cache[cle]
+        for colonne in (2, 3, 4):
+            v = C.textes.get((feuille, ll, colonne))
+            if isinstance(v, str) and EN_TETE_RE.match(v.strip()) and len(v.strip()) > 4:
+                _cache[cle] = v.strip()
+                return _cache[cle]
     _cache[cle] = "(hors bloc)"
     return _cache[cle]
 

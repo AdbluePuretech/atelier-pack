@@ -39,7 +39,9 @@ prompt](contrat-prompt.md)**. Trois d'entre elles se ratent souvent :
 
 - **au plus sept pages** — mediane du corpus 6,5 ;
 - **le bloc `Xlsx Output` / `Formatting Requirements`**, present dans 45 prompts
-  sur 45, et celui qu'on oublie en ecrivant un pack neuf ;
+  sur 45, et celui qu'on oublie en ecrivant un pack neuf. Il s'ecrit **depuis la fiche
+  de mise en page** du pack — colonnes, unites, police, encre — et non depuis le prompt
+  du voisin ;
 - **aucune formule** : le prompt dit quoi produire, jamais comment.
 
 ```
@@ -112,6 +114,11 @@ Et des tests explicites quand le defaut ne convient pas :
 decimales tolere ±0,0005 ; le tolerer a ±1 % relatif reviendrait a accepter une
 erreur de methode.
 
+**Les boucles se notent.** Chaque boucle du pack — un prerequis — porte au moins un critere
+sur la valeur qu'elle resout, avec une tolerance plus serree que son amplitude : coupee, la
+boucle fait tomber ce critere. Les regles : [le contrat de la rubric, section 7
+bis](contrat-rubric.md#7-bis-noter-le-resultat-de-chaque-boucle).
+
 ## Le pool, les poids
 
 Le pool total et sa repartition dependent du corpus : **regarder le document
@@ -181,6 +188,15 @@ python outils/noter.py "<golden>" --rubric "<rubric.txt>"
   VALEUR : 152 / 152 points  (100.0%)
 ```
 
+Et le second controle, sur les boucles :
+
+```
+python outils/amplitude_boucles.py "<golden>" --rubric "<rubric.txt>"
+```
+
+**Chaque boucle coupee doit couter au moins un critere.** Une boucle qui ne coute aucun point
+n'est pas notee, donc ne tient pas le prerequis.
+
 **La golden doit marquer 100 % de sa propre rubric.** En dessous, ce n'est pas le
 classeur qui a un probleme : c'est la rubric qui nomme une mauvaise cellule, arrondit
 mal, ou pose une tolerance impossible.
@@ -248,7 +264,9 @@ python outils/txt_vers_docx.py "Rubric - X.txt" "Rubric - X.docx" --gabarit <nom
 ```
 
 Le format se **reprend** du gabarit, il ne s'imite pas (piege 11). Voir
-**[les contrats de format](contrats-format.md)**.
+**[les contrats de format](contrats-format.md)**. Le gabarit est celui de la **famille de
+documents** choisie dans la fiche du pack, prise dans le corpus : voir
+**[la mise en page](mise-en-page.md)**.
 
 ---
 

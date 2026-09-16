@@ -112,11 +112,20 @@ def test_de_coupe(wb, g):
     # pack entierement bati sur sa circularite.
     #
     # C'est la meme correction que celle deja appliquee a commutateurs.py.
+    #
+    # Le libelle ne se cherche plus en colonne C seulement : la mise en page fait
+    # varier la colonne des libelles (B, C ou D), et la valeur se lit dans la
+    # premiere cellule numerique a sa droite, pas en D d'office.
     breakers = {}
-    for r in range(1, inp.max_row + 1):
-        lib = inp.cell(row=r, column=3).value
-        if isinstance(lib, str) and lib.strip().lower().startswith("breaker"):
-            breakers[lib.strip()] = ["$D$" + str(r)]
+    for row in inp.iter_rows():
+        lib = next((c for c in row if isinstance(c.value, str)
+                    and c.value.strip().lower().startswith("breaker")), None)
+        if lib is None:
+            continue
+        val = next((c for c in row if c.column > lib.column and c.value is not None
+                    and not isinstance(c.value, str)), None)
+        if val is not None:
+            breakers[lib.value.strip()] = ["$" + val.column_letter + "$" + str(val.row)]
 
     for nom in list(wb.defined_names):
         try:
@@ -178,25 +187,44 @@ def test_de_coupe(wb, g):
                 for adresse in (forme, nu):
                     marques.append("'" + inp.title + "'!" + adresse)
                     marques.append(inp.title + "!" + adresse)
+        # Une citation se borne : `Input_Sheet!$E$10` ne doit pas reconnaitre
+        # `Input_Sheet!$E$100`, ni `Brk_A` reconnaitre `Brk_AP`. Sans borne, couper un
+        # interrupteur coupait aussi toute formule lisant une ligne d'hypotheses dont
+        # le numero le prolonge - mesure le 14/09/2026 sur Cobalt : la boucle
+        # d'adequate protection tombait « inerte » parce que Brk_Unused (ligne 10)
+        # tranchait les formules citant les lignes 100 a 109.
+        motifs = [re.compile(re.escape(m) + r"(?![0-9A-Za-z_])") for m in marques]
         out = {}
         for cle, arcs in g.items():
             f, col, lig = cle
             v = wb[f].cell(row=lig, column=col).value
             out[cle] = [] if (isinstance(v, str)
-                              and any(m in v for m in marques)) else arcs
+                              and any(p.search(v) for p in motifs)) else arcs
         return out
 
     # Un cycle qui survit a la coupure de TOUS les breakers n'appartient a
     # aucune mecanique : c'est une fuite. Sans le soustraire, chaque breaker se
     # verrait crediter de ce residu, y compris ceux qui ne sont pas construits.
     residuel = cellules_en_cycle(couper(list(breakers)))
+    # L'interrupteur GENERAL. Quand chaque formule de boucle cite le general en plus
+    # du sien (IF(Brk_All*Brk_X=1,...)), couper « tous les autres » coupe aussi le
+    # general, donc toutes les boucles : chaque mecanique paraissait inerte. Mesure
+    # le 14/09/2026 sur Cobalt : quatre boucles reelles rendues « 0 ».
+    # Un general se reconnait a ce qu'il coupe TOUS les cycles a lui seul, alors
+    # qu'un autre interrupteur n'en coupe qu'une partie. Si tous les coupent tous
+    # (une seule boucle), il n'y a pas de general et la lecture d'origine vaut.
+    totaux = {n for n in breakers if not (cellules_en_cycle(couper([n])) - residuel)}
+    generaux = totaux if 0 < len(totaux) < len(breakers) else set()
     sortie = []
     for nom, ancre in breakers.items():
+        if nom in generaux:
+            sortie.append((nom + " (interrupteur general)", 0, False))
+            continue
         # On debranche TOUTES les autres mecaniques et on regarde si celle-ci
         # cree encore un cycle a elle seule. C'est la seule lecture qui resiste
         # a la fusion : couper une boucle une par une ne prouve rien tant qu'une
         # autre emprunte le meme chemin et referme le cycle a sa place.
-        seule = cellules_en_cycle(couper([n for n in breakers if n != nom]))
+        seule = cellules_en_cycle(couper([n for n in breakers if n != nom and n not in generaux]))
         propre = len(seule) - len(residuel & seule)
         sortie.append((nom, propre, propre > 0))
     return base, residuel, sortie

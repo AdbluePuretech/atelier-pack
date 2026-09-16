@@ -19,6 +19,12 @@ Chaque corpus a le sien. Ce qui suit decrit la **forme** d'un contrat de format 
 donne celui d'un corpus reel en exemple — pas une norme universelle. Face a un
 nouveau corpus : ouvrir son document d'exemple et en relever les valeurs.
 
+**Et chaque pack prend sa propre mise en page dans ce corpus, toujours aux standards
+stricts d'une banque d'affaires** (decision du 14/09/2026) : grille, architecture,
+police, teinte, famille de documents. Ce contrat dit ce qui se tient partout ; ce qui
+change d'un pack a l'autre, l'enveloppe IB dont rien ne sort, et le controle qui les
+verifie, vivent dans **[la mise en page](mise-en-page.md)**.
+
 ---
 
 ## I. Le classeur
@@ -67,16 +73,21 @@ fm.palette("onyx")      # ou "maison", la valeur par defaut
 ```
 
 **Relever la palette dans le prompt du corpus servi avant d'ecrire une ligne** — le
-bloc `Formatting Requirements` la donne. La couleur ne s'ecrit jamais a la main :
+bloc `Formatting Requirements` la donne. **Pour un pack livre, c'est la convention de
+marche, standard IB, et elle ne varie pas d'un pack a l'autre** : la mise en page change,
+l'encre jamais. La couleur ne s'ecrit jamais a la main :
 elle se deduit du contenu, ce qui rend la derive impossible par distraction.
 
 ### Police et corps
 
-Une seule police pour tout le classeur, un seul corps. L'exemple du corpus fait foi :
-si la reference est en Arial 8, le pack est en Arial 8.
+Une seule police pour tout le classeur, un seul corps, **pris dans la fiche de mise en
+page du pack** parmi les polices de place : Arial, Calibri, Tahoma, Garamond, Times New
+Roman, Cambria, Book Antiqua, en corps 8, 9 ou 10. Le corpus en livre d'autres (Goudy
+Old Style, Rockwell, Manrope) et du corps 11 : ce ne sont pas des standards IB, on ne
+les reprend pas.
 
 ```
-POLICE = "Garamond"      # celle du corpus qui a servi d'exemple ici
+POLICE = "Garamond"      # un exemple : la fiche de mise en page du pack decide
 TAILLE = 8
 ```
 

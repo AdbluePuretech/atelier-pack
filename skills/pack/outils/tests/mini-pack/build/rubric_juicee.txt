@@ -1,0 +1,6 @@
+Project Essai - Assessment Rubric (juiced)
+
+Section A — Loan (3 criteria, 6 points)
+[+4] Calc — Fee on net proceeds — FY2026 — 1.961
+[+2] Calc — Net proceeds — FY2030 — 98.039
+[+0] Fee gate — the fee is computed on the net proceeds it reduces. If not met, every criterion in this section scores 0.

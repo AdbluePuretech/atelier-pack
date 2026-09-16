@@ -1,6 +1,6 @@
 ---
 name: pack
-description: Fabriquer de bout en bout un pack de tache d'evaluation financiere - prompt, input sheet, golden solution, rubric - le certifier, le noter et le passer au QA. Porte aussi l'AUDIT d'un classeur seul, quelle que soit sa provenance. A invoquer via /pack ou quand l'utilisateur dit "fabrique une tache", "construis un pack", "monte-moi une golden solution", "ecris la rubric", "fais tourner le QA", "on livre ce pack", mais AUSSI "audite ce modele", "ce classeur est-il sans erreur", "certifie la golden", "verifie le modele de fond en comble", "cherche les erreurs dans ce classeur", "fais un model audit", ou parle de concevoir une tache d'evaluation pour un lab.
+description: Fabriquer de bout en bout un pack de tache d'evaluation financiere - prompt, input sheet, golden solution, rubric - le certifier, le noter et le passer au QA. Porte aussi l'AUDIT d'un classeur seul, quelle que soit sa provenance. A invoquer via /pack ou quand l'utilisateur dit "fabrique une tache", "construis un pack", "monte-moi une golden solution", "ecris la rubric", "fais tourner le QA", "on livre ce pack", mais AUSSI "audite ce modele", "ce classeur est-il sans erreur", "certifie la golden", "verifie le modele de fond en comble", "cherche les erreurs dans ce classeur", "fais un model audit", ou parle de concevoir une tache d'evaluation pour un lab ; et "juice", "juicer la rubric", "juice la rubric de <pack>" (protocole de juicing).
 ---
 
 # Skill : Fabriquer un pack de tache d'evaluation
@@ -62,19 +62,42 @@ d'auto-reference eprouvees, chacune avec le piege exact qu'un bon modele y tombe
 Chacune se termine par un **chiffre**, pas par une impression. Une phase ne
 commence pas tant que la precedente n'a pas rendu le sien.
 
+**Chaque phase se ferme par une porte, puis un relais.** `outils/porte.py <phase>
+pack.json` lance tous les controles de la phase et reste fermee tant qu'une ligne n'est
+pas verte avec son compte. Porte ouverte, Claude s'arrete : il montre le tableau,
+**propose** au owner ce qui vaut un coup d'oeil sans rien ouvrir, et attend `valide`,
+`modifie` ou `refuse`. La phase suivante refuse de demarrer sans relais `valide`, et une
+porte dont un fichier a change depuis est perimee. Nouveau pack : `porte.py init`. Le
+protocole : **[les portes](references/portes.md)**.
+
 ### 1. Concevoir - [le detail](references/01-concevoir.md)
 
+**Elle s'ouvre par un brainstorming avec l'auteur** — les pistes developpees une par
+une, une question par message, la conception ecrite seulement sur ce qu'il retient — et
+**la graine est un contrat** : chaque ajout se rattache a une de ses lignes, sinon il
+n'entre pas, meme pour durcir.
+
 Du sujet au noyau dur : ce qui rend la tache difficile a reproduire, les frontieres
-a ne pas franchir, le niveau vise. **C'est ici que le score du candidat se decide** —
+a ne pas franchir, le niveau vise — **lu dans les onglets, jamais a leur nombre** : un L3
+peut tenir en dix onglets denses. **C'est ici que le score du candidat se decide** —
 la rubric ne mesure que ce que le prompt demande, elle ne rattrape pas une tache
-concue trop facile. On y pose le **budget de discrimination** (au plus ~37 % du pool
-derriere de la transcription), le **piege nomme** de chaque mecanique, et le
+concue trop facile. On y pose le **budget de discrimination** (au plus ~20 % du pool
+derriere de la transcription, avec des **difficultes independantes** : jamais une
+cascade ou une seule erreur emporte la rubric), le **piege nomme** de chaque mecanique, et le
 **fichier d'ancrages** : les valeurs que la golden devra atteindre, decidees AVANT
 de construire.
 
-> **Sortie** : le noyau dur nomme, le budget tenu, le piege nomme, le rollout
-> d'enonce lance, les frontieres posees, les ancrages et les tests de declenchement
-> ecrits.
+**Les boucles de circularite sont un prerequis, pas un axe a arbitrer.** Tout pack en
+porte, a tout niveau, au moins le plancher de sa grille (L1 : 1, L2 : 4, L3 : 6), et
+chacune est reelle : nommee, debranchable, et elle deplace une valeur notee. **Aucune
+derogation** : ni parce que le sujet n'en porte pas d'evidente, ni parce que la graine
+exclut les effets d'ordre fabriques. On cherche alors la boucle portee par une convention
+des pieces - [comment la trouver](references/01-concevoir.md#quand-le-sujet-ne-porte-pas-de-boucle-evidente).
+
+> **Sortie** : **porte 1 ouverte, relais 1 valide** — la conception au plan impose
+> (noyau, budget, pieges, boucles au moins au plancher, fiche de mise en page),
+> `ancrages.json` au format commun, chaque element rattache a la graine. Zero boucle :
+> la porte reste fermee.
 
 ### 2. Batir - [le detail](references/02-batir.md)
 
@@ -84,9 +107,16 @@ une graine fixe**, seule facon de le refaire a l'identique quand un ancrage boug
 calage est l'etape qu'on oublie : les ancrages doivent tomber sur les valeurs que
 **Excel calcule**, pas sur celles que Python croyait produire.
 
-> **Sortie** : `0 erreur` au recalcul, chaque ancrage atteint a sa tolerance sur les
-> valeurs calculees, les tests de declenchement qui mordent, et chaque boucle qui
-> deplace une valeur notee.
+**La golden se construit par iterations** : le squelette (iteration 0), puis une
+mecanique par iteration, chacune fermee par sa mini-porte (`porte.py 2 --iteration k`)
+et son relais. **L'auteur y met la main quand il le veut** : Claude lui propose ce qui
+vaut un coup d'oeil, et si le owner retouche la golden, chaque modification est relue,
+puis reportee dans le generateur ou abandonnee, sur sa decision -
+[les ateliers](references/ateliers.md).
+
+> **Sortie** : **porte 2 ouverte, relais 2 valide** — les iterations 0 a n validees,
+> `0 erreur` en cache, chaque ancrage atteint, les boucles au plancher, 0 hypothese
+> morte, le niveau tenu, la mise en page aux standards IB et distincte du lot.
 
 ### 3. Certifier - [le detail](references/03-certifier.md)
 
@@ -105,7 +135,9 @@ candidat, un modele de production, une version d'archive. On entre directement
 ici sans passer par les phases 1 et 2.
 
 > **Sortie** : le taux de couverture, et un issues log ou chaque etape non
-> lancee est inscrite comme travail non fait, jamais comme resultat favorable.
+> lancee est inscrite comme travail non fait, jamais comme resultat favorable. Dans un
+> pack : **porte 3 ouverte** — couverture ≥ 95 % sur la golden actuelle, aucune etape non
+> faite — **et relais 3 valide**.
 
 ### 4. Enoncer et noter - [le detail](references/04-noter.md)
 
@@ -118,15 +150,31 @@ classeur recalcule, jamais de memoire, et retournee contre la golden elle-meme.
 Le contrat du prompt, releve sur le corpus : [ses neuf blocs et ses six
 regles](references/contrat-prompt.md).
 
-> **Sortie** : `verifier_prompt.py` sans echec, et la golden marque **100 %** de sa
-> propre rubric. En dessous, c'est la rubric qui est fausse, pas le classeur.
+> **Sortie** : **porte 4 ouverte, relais 4 valide** — `verifier_prompt.py` et
+> `verifier_rubric.py` sans echec, la golden marque **100 %** de sa propre rubric,
+> **chaque boucle coupee fait tomber au moins un critere** (`amplitude_boucles.py`), 0
+> orpheline entre prompt et rubric. En dessous de 100 %, c'est la rubric qui est
+> fausse, pas le classeur.
 
 ### 5. Verifier - [le detail](references/05-verifier.md)
 
 Le QA du pack, les questions qu'un evaluateur posera, et le **rollout** : simuler un
 candidat credible et mesurer ce qu'il obtient.
 
-> **Sortie** : le QA au vert avec ses comptes, et un score de rollout dans la cible.
+> **Sortie** : **porte 5 ouverte, relais 5 valide** — le QA au vert avec ses comptes, et
+> la feuille de score de l'AI Output, rendue sur claude.ai contre la rubric actuelle, dans
+> la cible.
+
+### Juicer une rubric - [le protocole](references/juicer.md)
+
+**Quand Amir demande de « juicer » une rubric**, appliquer son protocole mot pour mot : la golden
+re-note exactement 100 %, un AI Output de modele frontiere tombe entre 20 et 35 % (plafond 40 %),
+par la structure (points de routine retires, gates a +0 sur les mecaniques cles, keystones,
+penalites de raccourci) et sous des garde-fous d'equite bloquants. Deux feuilles de score ligne a
+ligne et une note d'equite sont livrees avec la rubric revisee.
+
+> **Sortie** : **porte juicing ouverte** — golden a 100 %, adverse entre 20 et 40 %, chaque
+> gate et keystone justifiee dans la note d'equite.
 
 ## Ce que cette skill ne decidera pas
 
@@ -140,8 +188,8 @@ Ces arbitrages sont le travail. Le reste est de l'outillage.
 
 ## Les outils
 
-Trente-cinq outils portables vivent dans [`outils/`](outils/README.md) : les
-vingt et un du pack, et les quatorze du moteur d'audit de la phase 3. Ils ne savent rien
+Une quarantaine d'outils portables vivent dans [`outils/`](outils/README.md) : ceux du
+pack, les quatorze du moteur d'audit de la phase 3, et `porte.py` avec ses tests. Ils ne savent rien
 du sujet - ils marchent sur n'importe quel pack, et pour ceux de l'audit, sur
 n'importe quel classeur. Les scripts qui **construisent**
 (ancrages, calibrateur, generateur) sont au contraire a ecrire pour chaque pack —
@@ -155,6 +203,9 @@ c'est normal, le sujet change a chaque fois.
   acceptes — deposes dans [`gabarits/`](gabarits/). Sans eux, le format ne peut pas
   etre repris, et un format reconstitue de memoire se voit immediatement. Voir
   [les contrats de format](references/contrats-format.md).
+- **La mise en page des packs deja livres du lot** : chaque pack prend la sienne,
+  grille, architecture, typographie et documents compris, et ne double aucun voisin.
+  Voir [la mise en page](references/mise-en-page.md).
 
 ---
 

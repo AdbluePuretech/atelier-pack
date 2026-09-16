@@ -1,6 +1,6 @@
 ---
 title: "Phase 5 - Verifier le pack avant livraison"
-description: "Les six controles du QA, les questions qu'un evaluateur posera, et le rollout qui mesure la difficulte reelle."
+description: "Les sept controles du QA, les questions qu'un evaluateur posera, et le rollout qui mesure la difficulte reelle."
 type: "reference"
 status: "actif"
 ---
@@ -22,7 +22,7 @@ correcteur** ; un modele de frontiere arrive-t-il ou on l'attend. La cinquieme e
 la notre, et c'est celle qui protege le pack : **chaque point retire est-il
 defendable ?**
 
-## Les six controles
+## Les sept controles
 
 Chacun rend un compte. **Un vert sans compte ne vaut rien** — c'est le mode de
 defaillance principal de cette phase (pieges 1 et 2).
@@ -104,7 +104,21 @@ echouer.
 **C'est le controle qui trouve les faux verts.** Un controle code en dur a zero, ou
 qui soustrait une cellule a elle-meme, passe tous les autres tests.
 
-### 6. Les traces de fabrication automatique
+### 6. La mise en page tient les standards IB et ne double aucun pack du lot
+
+```
+python outils/mise_en_page.py "<golden>" --contre "<dossier du lot>"
+```
+
+Verifie d'abord l'**enveloppe IB** — encre de place, police et corps de place, periodes
+alignees d'un onglet date a l'autre, bandeau sombre, aucun fond vif, quadrillage masque,
+negatifs entre parentheses — puis compare la golden a chaque classeur deja livre du lot :
+au moins 3 axes de structure et 2 d'habillage differents, dont la teinte du bandeau.
+Sortie attendue : aucun `HORS STANDARD IB`, et `N classeurs compares, 0 trop proches`,
+avec N egal au nombre de packs livres du lot. Zero compare sort en echec. Voir
+[la mise en page](mise-en-page.md).
+
+### 7. Les traces de fabrication automatique
 
 ```
 python outils/traces_ia.py "<golden>" --detail
@@ -143,8 +157,8 @@ L'exemption se lit dans le **denominateur**, jamais en silence :
 [JUGE] T11  aucun onglet creux    1   sur 2 onglets de calcul, 2 intercalaire(s) exempte(s)
 ```
 
-C'est le meme partage que celui du corpus, qui exclut deja les separateurs du
-compte d'onglets fixant le niveau.
+C'est le meme partage que celui de `niveau.py`, qui exclut les separateurs des
+onglets de calcul dont il mesure la densite.
 
 Sortie attendue : `defauts objectifs : 0`, et **le nombre de textes lus** a cote.
 La separation des deux natures n'est pas une precaution de style : une fausse
@@ -342,6 +356,7 @@ parite LibreOffice    0 divergence     (sur N cellules)
 tracabilite           0 orpheline dans les deux sens
 hypotheses mortes     0
 audit golden          0 defaut
+mise en page          0 ecart IB, 0 trop proche  (sur N packs livres du lot)
 traces IA             0 defaut objectif  (sur N textes lus)
 rollout               score dans la cible, 0 critere non resolu
                       (grading rendu sur claude.ai, pas ici)

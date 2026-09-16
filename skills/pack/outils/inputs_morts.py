@@ -38,6 +38,37 @@ if FEUILLE not in wb.sheetnames:
     raise SystemExit("  ARRET — feuille absente : " + FEUILLE)
 ws = wb[FEUILLE]
 
+
+def colonne_des_libelles(ws):
+    """La colonne des libelles, lue sur la feuille et non supposee.
+
+    La mise en page fait varier cette colonne d'un pack a l'autre (B, C ou D).
+    L'outil la tenait en C : sur une feuille aux libelles en D, il rendait
+    « 0 hypothese consommee, 0 morte » sans erreur - un vert qui n'avait rien lu
+    (mesure le 15/09/2026 sur le pack Split). Sur chaque ligne qui porte un
+    nombre, le libelle est le PREMIER texte de la ligne, a gauche de ce nombre ;
+    la colonne qui gagne le plus de lignes est celle des libelles.
+
+    Le texte le plus long ne marche pas : dans un registre, les noms de
+    contreparties a droite du libelle sont plus longs que lui, et Sarrasin
+    tombait en colonne E (287 hypotheses lues au lieu de 379). Le premier texte
+    rend C sur Cobalt, Sarrasin et Zen, D sur Split et Valhalla.
+    """
+    votes = {}
+    for row in ws.iter_rows():
+        premier = next((c for c in row if isinstance(c.value, str)
+                        and c.value.strip() and not c.value.startswith("=")), None)
+        if premier is None:
+            continue
+        if any(c.column > premier.column and c.value is not None
+               and not isinstance(c.value, str) for c in row):
+            votes[premier.column] = votes.get(premier.column, 0) + 1
+    return max(votes, key=votes.get) if votes else 3
+
+
+LIB = colonne_des_libelles(ws)
+VAL = LIB + 1
+
 # ---- 1. toutes les formules du classeur, hors la feuille d'hypotheses -------
 # On exclut la feuille elle-meme : une hypothese citee UNIQUEMENT par une autre
 # ligne de la meme feuille, elle-meme morte, reste morte.
@@ -69,8 +100,9 @@ def cite(colonne, ligne, texte, local=False):
     for n in noms.get((colonne, ligne), []):
         if re.search(r"(?<![A-Za-z0-9_])" + re.escape(n) + r"(?![A-Za-z0-9_])", texte):
             return True
-    prefixe = r"(?:{f}!)?".format(f=re.escape(FEUILLE)) if local \
-        else r"{f}!".format(f=re.escape(FEUILLE))
+    # un nom de feuille qui porte une espace se cite entre apostrophes : 'Input Sheet'!$D$8
+    prefixe = r"(?:'?{f}'?!)?".format(f=re.escape(FEUILLE)) if local \
+        else r"'?{f}'?!".format(f=re.escape(FEUILLE))
     if re.search(r"(?<![A-Za-z0-9_!]){p}\$?{c}\$?{l}(?![0-9])".format(
             p=prefixe, c=colonne, l=ligne), texte):
         return True
@@ -99,7 +131,7 @@ for row in ws.iter_rows():
 
 vivantes = set()
 for r in range(1, ws.max_row + 1):
-    if any(cite(get_column_letter(c), r, hors) for c in range(4, ws.max_column + 1)):
+    if any(cite(get_column_letter(c), r, hors) for c in range(VAL, ws.max_column + 1)):
         vivantes.add(r)
 while True:
     gagnees = set()
@@ -111,7 +143,7 @@ while True:
             if r in vivantes or r in gagnees:
                 continue
             if any(cite(get_column_letter(c), r, texte, local=True)
-                   for c in range(4, ws.max_column + 1)):
+                   for c in range(VAL, ws.max_column + 1)):
                 gagnees.add(r)
     if not gagnees:
         break
@@ -119,7 +151,7 @@ while True:
 
 morts, vivants, tolerees = [], 0, 0
 for r in range(1, ws.max_row + 1):
-    lab = ws.cell(row=r, column=3).value
+    lab = ws.cell(row=r, column=LIB).value
     if not isinstance(lab, str) or not lab.strip():
         continue
     if re.match(r"^\s*\d+ - ", lab):          # bandeau de section
@@ -130,7 +162,7 @@ for r in range(1, ws.max_row + 1):
     # clause de la nation la plus favorisee vivent en T, U et V. Un controle
     # arrete a la colonne I ne les regarde jamais — et une colonne morte y
     # passerait inapercue exactement comme les ratios de main-d'oeuvre.
-    remplies = [c for c in range(4, ws.max_column + 1)
+    remplies = [c for c in range(VAL, ws.max_column + 1)
                 if ws.cell(row=r, column=c).value is not None]
     cols = [get_column_letter(c) for c in remplies]
     # une hypothese est une ligne dont au moins une cellule de valeur est SAISIE,
@@ -151,6 +183,7 @@ for r in range(1, ws.max_row + 1):
     morts.append((r, lab.strip(), saisies, ns, relais))
 
 print("  classeur   : {}".format(CLASSEUR))
+print("  libelles   : colonne {} (lue sur la feuille)".format(get_column_letter(LIB)))
 print("  hypotheses consommees : {}".format(vivants))
 if tolerees:
     print("  tolerees explicitement: {}".format(tolerees))

@@ -1,0 +1,41 @@
+[
+ {
+  "id": "A01",
+  "mecanique": "M1",
+  "poste": "Fee on net proceeds",
+  "periode": "FY2026",
+  "cellule": "Calc!E5",
+  "valeur": 1.96078,
+  "tolerance": {
+   "relative": 0.001
+  },
+  "nature": "D",
+  "pourquoi": "la boucle converge a 2/102"
+ },
+ {
+  "id": "A02",
+  "mecanique": "M1",
+  "poste": "Net proceeds",
+  "periode": "FY2026",
+  "cellule": "Calc!E4",
+  "valeur": 98.0392,
+  "tolerance": {
+   "relative": 0.001
+  },
+  "nature": "S",
+  "pourquoi": "100/1,02"
+ },
+ {
+  "id": "A03",
+  "mecanique": "M2",
+  "poste": "Interest on net proceeds",
+  "periode": "FY2026",
+  "cellule": "Calc!E6",
+  "valeur": 4.90196,
+  "tolerance": {
+   "absolue": 0.001
+  },
+  "nature": "S",
+  "pourquoi": "5 % du net"
+ }
+]

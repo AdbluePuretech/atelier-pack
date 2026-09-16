@@ -57,8 +57,8 @@ VIOLETS = ("FF7030A0", "FF800080", "FF7B2FBE", "FF9900FF")
 # Un intercalaire est un separateur visuel de navigation : il ne calcule rien,
 # c'est sa fonction. Il est donc legitimement creux et n'a pas a porter de volet
 # fige - le juger comme un onglet de calcul rend deux fausses alertes par
-# separateur, et un classeur peut en porter huit. Le corpus les exclut deja du
-# compte d'onglets qui fixe le niveau ; on les exclut ici pour la meme raison.
+# separateur, et un classeur peut en porter huit. niveau.py les exclut deja des
+# onglets de calcul dont il mesure la densite ; on les exclut ici pour la meme raison.
 INTERCALAIRE = re.compile(r"^[\s>«»<|\-–—=•*.~_]+$|>>|<<")
 
 LIGNES_CREUSES = 8            # un onglet sous ce seuil ne trompe personne

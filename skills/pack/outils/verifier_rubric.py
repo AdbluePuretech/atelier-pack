@@ -46,7 +46,8 @@ SECTION = re.compile(r"^\s*Section\s+([A-Z0-9]+)\s*[—–-]\s*(.+)$", re.I)
 # nom de section. Compter le mot faisait voir deux gates la ou il y en a une.
 GATE = re.compile(r"\bgates?\b\s*[\u2014\u2013-]|scores?\s+0\b|\bgate\b.*\bif not met\b", re.I)
 # Une tolerance redite sur la ligne, alors qu'elle vit une fois en configuration.
-TOLERANCE_REDITE = re.compile(r"within\s*[±+]?\s*1\s*%|±\s*1\s*%\s*relative|1%\s*relative", re.I)
+# « 1 % » seul : un ±0.1% ou un ±11% n'est pas la tolerance par defaut redite
+TOLERANCE_REDITE = re.compile(r"within\s*[±+]?\s*(?<![\d.])1\s*%|±\s*(?<![\d.])1\s*%\s*relative|(?<![\d.])1%\s*relative", re.I)
 # Ce qu'un corps ne doit jamais porter : formule, identite, reference de cellule.
 FUITE = re.compile(r"='?[A-Za-z0-9 _.]+'?!\$?[A-Z]{1,3}\$?\d+|\bGS\b|\bGolden\b|^\s*=|![A-Z]{1,3}\d+")
 SEPARATEUR = "—"

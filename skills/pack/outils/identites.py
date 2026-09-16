@@ -31,6 +31,7 @@ Usage :
 """
 import argparse
 import collections
+import datetime
 import json
 import os
 import re
@@ -87,8 +88,53 @@ def colonnes_de_periode(C, feuille, _cache={}):
         ligne = max(par_ligne, key=lambda l: len(par_ligne[l]))
         if len(par_ligne[ligne]) >= 4:
             cols = sorted(par_ligne[ligne])
+    if not cols:
+        cols = colonnes_datees(C, feuille)
+        if cols:
+            DATEES.add(feuille)
     _cache[feuille] = cols
     return cols
+
+
+DATEES: set = set()
+
+
+def serie_temporelle(C, feuille, ligne, cols):
+    """La serie d'une ligne, ou {} si la ligne n'est pas une serie temporelle.
+
+    Sur une grille datee, un tableau pose sous la grille partage ses colonnes : un registre de dix
+    colonnes (montant, dates, parts, transfert) sous 150 jours. Ses colonnes ne mesurent pas la meme
+    chose, et le juger sur le signe ou l'ordre de grandeur rend un faux positif par ligne (trois sur
+    Etain). Une serie temporelle couvre la chronologie : on exige la moitie des colonnes de periode.
+    Les en-tetes FY gardent la regle d'origine."""
+    s = serie(C, feuille, ligne, cols)
+    if feuille in DATEES and len(s) < max(4, len(cols) // 2):
+        return {}
+    return s
+
+
+def colonnes_datees(C, feuille):
+    """Les colonnes de periode d'une grille datee : la plus longue suite de dates strictement croissantes
+    en colonnes contigues sur une meme ligne, quatre au moins.
+
+    Seul l'en-tete FY-2A etait reconnu. Une grille journaliere ou mensuelle dont l'en-tete est une ligne de
+    dates n'etait pas periodique aux yeux du module : sur la golden Etain (150 jours), les quatre familles
+    rendaient « 0 teste » et le module concluait « les identites tiennent ». Un en-tete de periodes se
+    reconnait a ce qu'il EST, une suite de dates qui avance, pas a la facon dont il s'ecrit.
+    """
+    par_ligne = collections.defaultdict(list)
+    for (f, l, c), v in C.valeurs.items():
+        if f == feuille and isinstance(v, (datetime.datetime, datetime.date)):
+            par_ligne[l].append((c, v))
+    meilleure = []
+    for l in sorted(par_ligne):
+        cellules = sorted(par_ligne[l])
+        suite = [cellules[0]]
+        for prec, cour in zip(cellules, cellules[1:]):
+            suite = suite + [cour] if (cour[0] == prec[0] + 1 and cour[1] > prec[1]) else [cour]
+            if len(suite) > len(meilleure):
+                meilleure = list(suite)
+    return [c for c, _ in meilleure] if len(meilleure) >= 4 else []
 
 
 def c1_continuite(C, tolerance=1e-06):
@@ -188,7 +234,7 @@ def c3_signe(C):
         if len(cols) < 4:
             continue
         for l in sorted({l for (f, l, c) in C.valeurs if f == feuille}):
-            s = serie(C, feuille, l, cols)
+            s = serie_temporelle(C, feuille, l, cols)
             vals = [v for v in s.values() if abs(v) > 1e-09]
             if len(vals) < 4:
                 continue
@@ -217,7 +263,7 @@ def c4_ordre_de_grandeur(C, facteur=100.0):
         if len(cols) < 4:
             continue
         for l in sorted({l for (f, l, c) in C.valeurs if f == feuille}):
-            s = serie(C, feuille, l, cols)
+            s = serie_temporelle(C, feuille, l, cols)
             vals = [abs(v) for v in s.values() if abs(v) > 1e-09]
             if len(vals) < 4:
                 continue
@@ -273,6 +319,18 @@ def main():
                 print(f"          {e['poste'][:42]:<42} {e['detail'][:74]}")
 
     print()
+    testes_total = sum(testes for _, _, testes, _ in familles)
+    if testes_total == 0:
+        print("ETAPE NON FAITE : aucune identite testable - aucune feuille periodique reconnue,")
+        print("  ni en-tete FY ni ligne de dates. Ce n'est PAS un resultat favorable : rien n'a ete teste.")
+        if a.json:
+            with open(a.json, "w", encoding="utf-8") as fh:
+                json.dump({"classeur": os.path.basename(a.classeur), "etape_faite": False,
+                           "testes_total": 0, "ecarts_total": 0, "familles": sortie},
+                          fh, ensure_ascii=False, indent=2)
+            print()
+            print(f"ecrit : {a.json}")
+        return 2
     if total == 0:
         print("OK : les quatre familles d'identites tiennent.")
         print("     Ce sont des chemins independants des ties du modele : le")
@@ -283,8 +341,8 @@ def main():
 
     if a.json:
         with open(a.json, "w", encoding="utf-8") as fh:
-            json.dump({"classeur": os.path.basename(a.classeur),
-                       "ecarts_total": total, "familles": sortie},
+            json.dump({"classeur": os.path.basename(a.classeur), "etape_faite": True,
+                       "testes_total": testes_total, "ecarts_total": total, "familles": sortie},
                       fh, ensure_ascii=False, indent=2)
         print(f"\necrit : {a.json}")
     return 1 if total else 0

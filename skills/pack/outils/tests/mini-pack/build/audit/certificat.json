@@ -1,0 +1,9 @@
+{
+ "classeur": "GoldenSolution - Essai.xlsx",
+ "empreinte_sha256": "ff0e9872127f9c8d57f3f74eef1f32d25dc7c8e1c33ae3d5e701ef35d427f0dc",
+ "cellules_de_calcul": 3,
+ "cellules_couvertes": 3,
+ "couverture_pct": 100.0,
+ "manques": {},
+ "journal": []
+}

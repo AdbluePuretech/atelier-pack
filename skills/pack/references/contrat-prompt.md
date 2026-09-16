@@ -63,8 +63,21 @@ d'en-tete de chaque feuille.
 
 ### P3 — `Sheet Contents` : le prompt EST le cahier des charges
 
-La carte nominative des onglets, `Nom_Onglet — ce qu'il porte`, groupee par famille.
-Presente dans les 45.
+La carte nominative des onglets. Presente dans les 45, et **sa forme est fixe** —
+relevee sur Solvo, Gdansk, Vistule et Sarrasin, exigee le 15/09/2026 apres un prompt
+qui groupait ses onglets en quelques puces (« pour le reste des packs c'est pas ca du
+tout ») :
+
+- « Sheet Contents » en **gras italique** ;
+- en tete, « Section dividers » et la liste des intercalaires ;
+- puis **un intertitre en italique par onglet, portant son nom exact, suivi d'une seule
+  puce** qui dit ce qu'il contient ;
+- et dans `Formatting Requirements`, la puce *« Workbook organised into the named sheets
+  listed below, with the section-divider tabs preserved for navigation »*.
+
+**Jamais d'onglets groupes en quelques puces**, meme quand un prompt court est demande :
+on raccourcit les Outputs, pas la carte des onglets. (La forme `Nom_Onglet — ce qu'il
+porte` groupee par famille, decrite ici jusqu'au 15/09/2026, n'est pas celle du corpus.)
 
 C'est la consequence structurante : **le prompt ne s'ecrit pas apres le modele.**
 Sa liste d'onglets et ses sorties exigees sont ce que le generateur doit
@@ -115,6 +128,18 @@ retombe alors sur le nombre de mots, a 440 mots la page.
   tranche pas se paie en pertes **fabriquees** au rollout : ce n'est pas de la
   difficulte, c'est de l'ambiguite, et le dossier d'equite donnera raison au
   candidat.
+- **Il ne porte pas de bloc « Computational Conventions ».** Aucun prompt livre n'en a ;
+  un bloc de conventions invente a ete rejete le 14/09/2026. Une convention a trancher
+  l'est dans la puce de sortie qu'elle concerne, ou dans l'`Input_Sheet`.
+- **Il ne detaille pas la methode.** Des puces **synthetiques** qui disent quoi produire,
+  pas comment le calculer. On ne garde que les precisions qu'une penalite de la rubric
+  sanctionne ; une version trop detaillee a ete rejetee le meme jour.
+- **Il ne met rien en gras qui oriente.** Aucun terme, piege ou mecanique en gras dans le
+  corps : le gras signale au candidat ce qui compte (decision du 16/09/2026). Le gras
+  reste aux intitules de structure que le corpus porte — titres de blocs, « Sheet
+  Contents ».
+- **Il ne s'invente pas de forme.** Sa famille (A, B ou C) se reprend du paquet Word
+  d'un prompt livre : voir [la mise en page](mise-en-page.md).
 
 ---
 

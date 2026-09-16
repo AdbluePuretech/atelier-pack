@@ -60,10 +60,16 @@ def trouver_feuille_hypotheses(chemin):
     except Exception:
         return None
     try:
-        for f in wb.sheetnames:
-            n = f.lower()
-            if "input" in n or "assumption" in n or "hypoth" in n:
-                return f
+        # Plusieurs feuilles peuvent porter le mot : un intercalaire `>>Inputs` vide
+        # precede souvent la vraie feuille. Le retenir parce qu'il vient d'abord
+        # comptait toutes les hypotheses en valeurs en dur (145 sur Cobalt, le
+        # 14/09/2026). On garde la candidate qui porte le plus de cellules.
+        candidates = [f for f in wb.sheetnames
+                      if any(m in f.lower() for m in ("input", "assumption", "hypoth"))]
+        if candidates:
+            def remplies(nom):
+                return sum(1 for row in wb[nom].iter_rows() for c in row if c.value is not None)
+            return max(candidates, key=remplies)
         compte = {}
         for _, dn in list(wb.defined_names.items()):
             try:

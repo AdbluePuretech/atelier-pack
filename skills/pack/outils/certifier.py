@@ -147,6 +147,9 @@ def certifier(chemin, feuille_inputs, familles=None, convergence=None,
     if identites is None:
         journal.append({"cle": "D0", "constat": "identites imposees : jamais lancees",
                         "gravite": "significatif", "portee": 0, "statut": "ouvert"})
+    elif identites.get("etape_faite") is False:
+        journal.append({"cle": "D0", "constat": "identites imposees : aucune identite testable, rien n'a ete teste",
+                        "gravite": "significatif", "portee": 0, "statut": "ouvert"})
     elif identites.get("ecarts_total"):
         journal.append({"cle": "D1",
                         "constat": "identites que le modele ne declare pas : ecarts a juger",

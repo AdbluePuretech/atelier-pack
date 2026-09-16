@@ -33,6 +33,10 @@ changements permis — et **une note de changement d'une page** : ce qui a chang
 confirmation que le basculement de forme a ete applique, et chaque ligne de format
 ajoutee **avec la preuve golden** qu'elle etait deja satisfaite.
 
+**La rubric se livre en `.docx`**, dans une famille livree dont les sections sont en style
+de titre — Ostrom, ou la numerotee (voir [la mise en page](mise-en-page.md)). **Jamais de
+`.json` livre** : le `.json` n'est qu'un format de travail que les outils savent lire.
+
 ### La marche a suivre
 
 1. Lire les puces, et **mapper chacune a une regle** — le repertoire du §12 le fait
@@ -157,6 +161,29 @@ tient — **et** elle garde sa section : si le build la rate, **toute la section
 > gates, guards or zeroes any other criterion or any section » — c'est une
 > exception, pas la regle.
 
+## 4 bis. Des criteres independants, pas une cascade
+
+**Decision du 16/09/2026 : une faute unique n'emporte pas la rubric.** Une rubric ou une
+seule erreur en tete de chaine fait tomber la majorite des points penalise la meme faute
+plusieurs fois. C'est un defaut d'equite, meme quand il aide a passer sous 45 %.
+
+Ce contrat note des valeurs isolees contre la golden (section 1) : il ne peut pas noter
+« sur les chiffres du candidat ». L'independance se construit donc dans la tache
+([phase 1, section 2](01-concevoir.md#des-difficultes-independantes-pas-une-cascade)), et
+la rubric la respecte :
+
+- **une valeur notee = une mecanique**, lue sur des donnees fournies, en deux etapes au
+  plus ;
+- **les valeurs terminales** (un total, la decision finale) portent un ou deux criteres,
+  pas une section ;
+- **une gate ne met a zero que son module** : la section qu'elle garde est dessinee
+  autour d'une seule mecanique ;
+- quand les sorties s'enchainent, l'aval se note sur des grandeurs qui ne dependent pas
+  de l'amont (ratios par dollar, effets unitaires).
+
+**Controle** : pour chaque piege nomme, poser l'erreur dans une copie de la golden,
+recalculer, renoter avec `noter.py` ; seuls les criteres de son module doivent tomber.
+
 ## 5. Les penalites
 
 - **Plafond = `round(0,20 x pool positif)`.** `Final = max(0, positifs − min(penalites, plafond))`.
@@ -203,6 +230,24 @@ verifier.
 une periode ou il a de l'activite, ou un zero exact la ou le prompt l'impose — prouve
 que l'onglet existe *et* qu'il est juste, et rend une gate de roll-up utile. Ces
 ancrages vivent dans leur propre section, sous une gate d'unites.
+
+## 7 bis. Noter le resultat de chaque boucle
+
+**Decision d'Amir du 16/09/2026** : les boucles de circularite sont un prerequis du pack, et
+**leurs resultats se notent dans la rubric**. Une boucle que la rubric ne mesure pas ne compte
+pas comme boucle.
+
+- **Au moins un critere par boucle, sur la valeur qu'elle resout elle-meme** : la cellule qui
+  ferme le cycle ou sa sortie immediate (le principal rembourse, la commission, le montant
+  grossi). Un total en aval qui absorbe la boucle ne suffit pas.
+- **Sa tolerance est plus serree que l'amplitude de la boucle** : coupee, la boucle fait
+  echouer ce critere. Quand le defaut relatif l'absorbe, le critere porte sa bande absolue en
+  ligne — l'exception de la section 3 —, justifiee par la grandeur : un montant qui se regle
+  au cent, un taux resolu.
+- **Poids** : `+2` au moins (ancrage significatif), `+3` si la boucle est une tete de chaine.
+- **Controle** : `amplitude_boucles.py` coupe chaque interrupteur et renote la golden. Chaque
+  boucle doit faire tomber **au moins un critere** ; zero point perdu = boucle decorative = pack
+  non conforme au prerequis.
 
 ## 8. Le compte
 
@@ -324,7 +369,7 @@ Dix des regles ci-dessus se mesurent, et elles sont branchees dans l'orchestrate
 du QA — le contrat ne vit donc plus seulement en prose :
 
 ```
-python outils/verifier_rubric.py "Rubric - <Pack>.docx"     # ou .json
+python outils/verifier_rubric.py "Rubric - <Pack>.docx"     # ou le .json de travail ; seul le .docx se livre
 ```
 
 Sortie attendue : `VIOLATIONS DE CONTRAT : 0`, chaque regle avec son compte et son
@@ -355,7 +400,7 @@ golden. Il juge la forme, celle dont depend la gradabilite.
 
 ## 15. L'auto-controle
 
-Onze cases, toutes a cocher avant de livrer :
+Treize cases, toutes a cocher avant de livrer :
 
 ```
 [ ] chaque critere autoportant : entite, poste, periode, valeur sur la ligne
@@ -368,7 +413,9 @@ Onze cases, toutes a cocher avant de livrer :
 [ ] poids dans {1,2,3,4} ; ~3 keystones ; part du +1 entre 33 et 47 %
 [ ] penalites 5 a 7, plafond round(0,20 x pool), chacune tire une fois
 [ ] ancrages rattaches aux valeurs EN CACHE ; hasard circulaire signale
-[ ] la golden re-note 100 % ; le docx valide
+[ ] chaque boucle notee : >= 1 critere sur sa valeur resolue, qui tombe quand on la coupe
+[ ] criteres independants : chaque erreur nommee ne fait tomber que son module
+[ ] la golden re-note 100 % ; le docx valide, aucun .json livre
 ```
 
 ---
